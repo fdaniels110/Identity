@@ -11,15 +11,59 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Identity.Models;
+using System.Net.Mail;
+using System.Net;
+using System.Configuration;
 
 namespace Identity
 {
     public class EmailService : IIdentityMessageService
     {
+        public static string Username { get; set; }
+        public static string Password { get; set; }
+        public static string Host { get; set; }
+        public static int Port { get; set; }
+        public static bool SSL { get; set; }
+        
+        public string Recipient { get; set; }
+        public string Subject { get; set; }
+        public string Body { get; set; }
+        public bool IsHTML { get; set; }
+
+        static EmailService()
+        {
+            Host = "smtp.gmail.com";
+            Port = 25;
+            SSL = true;
+            Username = ConfigurationManager.AppSettings["GmailUsername"];
+            Password = ConfigurationManager.AppSettings["GmailPassword"];
+
+        }
         public Task SendAsync(IdentityMessage message)
         {
             // Plug in your email service here to send an email.
-            return Task.FromResult(0);
+            SmtpClient smtp = new SmtpClient();
+            smtp.Host = Host;
+            smtp.Port = Port;
+            smtp.EnableSsl = SSL;
+            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+            smtp.UseDefaultCredentials = false;
+            smtp.Credentials = new NetworkCredential(Username, Password);
+            try
+            {
+                using (var mMessage = new MailMessage(Username, message.Destination))
+                {
+                    mMessage.Subject = message.Subject;
+                    mMessage.Body = message.Body;
+                    mMessage.IsBodyHtml = IsHTML;
+                    smtp.Send(mMessage);
+                    return Task.FromResult(0);
+                }
+            }
+            catch (Exception)
+            {
+                return Task.FromResult(1);
+            }
         }
     }
 
