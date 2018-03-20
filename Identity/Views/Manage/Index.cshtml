@@ -30,13 +30,13 @@
         </dd>
         @*
             Phone Numbers can used as a second factor of verification in a two-factor authentication system.
-             
+
              See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
                 for details on setting up this ASP.NET application to support two-factor authentication using SMS.
-             
+
              Uncomment the following block after you have set up two-factor authentication
         *@
-        @*  
+        @*
             <dt>Phone Number:</dt>
             <dd>
                 @(Model.PhoneNumber ?? "None")
@@ -84,4 +84,68 @@
                 }*@
         </dd>
     </dl>
+    <h3>Values from Identity</h3>
+    <table>
+        <tr>
+            <th>
+                IsAuthenticated
+            </th>
+            <td>
+                @ViewBag.ClaimsIdentity.IsAuthenticated
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Name
+            </th>
+            <td>
+                @ViewBag.ClaimsIdentity.Name
+            </td>
+        </tr>
+    </table>
+    <h3>Claims from ClaimsIdentity</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>
+                    Claim Type
+                </th>
+                <th>
+                    Claim Value
+                </th>
+                <th>
+                    Value Type
+                </th>
+                <th>
+                    Subject Name
+                </th>
+                <th>
+                    Issuer Name
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (System.Security.Claims.Claim claim in ViewBag.ClaimsIdentity.Claims)
+            {
+                <tr>
+                    <td>
+                        @claim.Type
+                    </td>
+                    <td>
+                        @claim.Value
+                    </td>
+                    <td>
+                        @claim.ValueType
+                    </td>
+                    <td>
+                        @claim.Subject.Name
+                    </td>
+                    <td>
+                        @claim.Issuer
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
 </div>

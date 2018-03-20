@@ -1,0 +1,3 @@
+﻿USE master -- be sure that you're not on MYDB
+ALTER DATABASE [aspnet-Identity-20180226072847] SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+DROP DATABASE [aspnet-Identity-20180226072847];

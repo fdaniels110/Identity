@@ -23,6 +23,7 @@ namespace Identity.Models
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
+            Database.SetInitializer<ApplicationDbContext>(new MyDBInitializer());
         }
 
         public static ApplicationDbContext Create()

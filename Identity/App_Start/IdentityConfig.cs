@@ -14,6 +14,8 @@ using Identity.Models;
 using System.Net.Mail;
 using System.Net;
 using System.Configuration;
+using System.ComponentModel;
+using System.Threading;
 
 namespace Identity
 {
@@ -24,31 +26,45 @@ namespace Identity
         public static string Host { get; set; }
         public static int Port { get; set; }
         public static bool SSL { get; set; }
-        
+        public static bool IsHTML { get; set; }
+
         public string Recipient { get; set; }
         public string Subject { get; set; }
-        public string Body { get; set; }
-        public bool IsHTML { get; set; }
+        public string Body { get; set; }        
 
         static EmailService()
         {
             Host = "smtp.gmail.com";
-            Port = 25;
+            Port = 587;
             SSL = true;
             Username = ConfigurationManager.AppSettings["GmailUsername"];
             Password = ConfigurationManager.AppSettings["GmailPassword"];
-
+            IsHTML = true;
         }
+
+       
         public Task SendAsync(IdentityMessage message)
         {
+            Thread email = new Thread(delegate ()
+            {
+                Send(message);
+            });
+            email.Start();
             // Plug in your email service here to send an email.
-            SmtpClient smtp = new SmtpClient();
-            smtp.Host = Host;
-            smtp.Port = Port;
-            smtp.EnableSsl = SSL;
-            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-            smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential(Username, Password);
+            return Task.FromResult(0);
+        }
+        
+        private void Send(IdentityMessage message)
+        {
+            SmtpClient smtp = new SmtpClient
+            {
+                Host = Host,
+                Port = Port,
+                EnableSsl = SSL,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(Username, Password),
+            };
             try
             {
                 using (var mMessage = new MailMessage(Username, message.Destination))
@@ -57,12 +73,11 @@ namespace Identity
                     mMessage.Body = message.Body;
                     mMessage.IsBodyHtml = IsHTML;
                     smtp.Send(mMessage);
-                    return Task.FromResult(0);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return Task.FromResult(1);
+                // TODO:log error
             }
         }
     }
@@ -91,7 +106,8 @@ namespace Identity
             manager.UserValidator = new UserValidator<ApplicationUser>(manager)
             {
                 AllowOnlyAlphanumericUserNames = false,
-                RequireUniqueEmail = true
+                RequireUniqueEmail = true, 
+                
             };
 
             // Configure validation logic for passwords

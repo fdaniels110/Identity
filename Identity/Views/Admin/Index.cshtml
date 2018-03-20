@@ -1,0 +1,22 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Admin Page</h2>
+
+<h3>This information is for admins only. </h3>
+
+<button class="form-control" id="super-secret">Only special agents can press this button</button>
+
+@section Scripts{
+<script>
+    $("#super-secret").click(function () {
+        $.get("@Url.Action("Secret")",
+            function (data) {
+                alert(data.msg);
+            })
+    });
+    
+</script>
+}

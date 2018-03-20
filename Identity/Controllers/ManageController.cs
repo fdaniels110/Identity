@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -54,6 +54,7 @@ namespace Identity.Controllers
         // GET: /Manage/Index
         public async Task<ActionResult> Index(ManageMessageId? message)
         {
+            ViewBag.ClaimsIdentity = Thread.CurrentPrincipal.Identity;
             ViewBag.StatusMessage =
                 message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
                 : message == ManageMessageId.SetPasswordSuccess ? "Your password has been set."
@@ -63,7 +64,7 @@ namespace Identity.Controllers
                 : message == ManageMessageId.RemovePhoneSuccess ? "Your phone number was removed."
                 : "";
 
-            var userId = User.Identity.GetUserId();
+            var userId = User.Identity.GetUserId();            
             var model = new IndexViewModel
             {
                 HasPassword = HasPassword(),
