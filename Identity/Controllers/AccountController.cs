@@ -176,6 +176,7 @@ namespace Identity.Controllers
                 {
                     if(user.Email == "frankdaniels110@gmail.com")
                     {
+                        UserManager.AddToRole(user.Id, "Admin");
                         UserManager.AddClaim(user.Id, new Claim("access", "partial"));
                     }
                     //await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
